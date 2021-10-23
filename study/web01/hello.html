@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hello Goland</title>
+</head>
+<body>
+<h1 style="color: chocolate">Hello Goland</h1>
+<h2>How are you?</h2>
+<button id="b1">切换图片</button>
+<button id="b2">还原图片</button>
+<img id="i1" src="https://himg2.huanqiucdn.cn/attachment2010/2019/0305/11/15/20190305111557700.jpg?w=1000" alt="唐艺昕">
+<!--    <img id="i2" src="https://rs1.huanqiucdn.cn/dp/api/files/imageDir/9536ce9e962ce1147a16049b795e2073.jpg">-->
+</body>
+<script>
+    document.getElementById('b1').onclick = function () {
+        document.getElementById('i1').src = "https://rs1.huanqiucdn.cn/dp/api/files/imageDir/9536ce9e962ce1147a16049b795e2073.jpg"
+    }
+
+    document.getElementById('b2').onclick = function () {
+        document.getElementById('i1').src = "https://himg2.huanqiucdn.cn/attachment2010/2019/0305/11/15/20190305111557700.jpg?w=1000"
+    }
+</script>
+</html>

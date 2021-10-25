@@ -2,10 +2,8 @@ package main
 
 import (
 	"fmt"
-	"gopkg.in/ini.v1"
 	"io/ioutil"
 	"net/http"
-	"os"
 )
 
 func sayHello(w http.ResponseWriter, r *http.Request) {
@@ -17,40 +15,40 @@ func sayHello(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	ff, _ := Asset("conf/conf.ini")
-	//fmt.Println(reflect.TypeOf(ff))
-	cfg, err := ini.Load(ff)
-	if err != nil {
-		fmt.Println(err)
-	}
-	//fmt.Println(cfg.Section("node").Key("nodes").String())
-
-	dir, _ := os.Getwd()
-	//fmt.Println(dir)
-	path := dir + "/conf/"
-	pathName := path + "my.ini"
-	cfg, err = ini.Load(pathName)
-	if err != nil {
-		fmt.Printf("Fail to read file: %v", err)
-		os.Exit(1)
-	}
-	b, err := modifyCfg(cfg)
-	//fmt.Println(b.String())
-
-	dir, _ = os.Getwd()
-	path = dir + "/conf/my.ini.local"
-
-	f, err := os.Create(path)
-	defer f.Close()
-	f.WriteString(b.String())
-	//http.HandleFunc("/hello", sayHello)
-	//err := http.ListenAndServe(
-	//	":9000",
-	//	nil,
-	//)
+	//ff, _ := Asset("conf/conf.ini")
+	////fmt.Println(reflect.TypeOf(ff))
+	//cfg, err := ini.Load(ff)
 	//if err != nil {
-	//	fmt.Printf("http serve failed, err:%v\n", err)
-	//	return
+	//	fmt.Println(err)
 	//}
-	//studyChi()
+	////fmt.Println(cfg.Section("node").Key("nodes").String())
+	//
+	//dir, _ := os.Getwd()
+	////fmt.Println(dir)
+	//path := dir + "/conf/"
+	//pathName := path + "my.ini"
+	//cfg, err = ini.Load(pathName)
+	//if err != nil {
+	//	fmt.Printf("Fail to read file: %v", err)
+	//	os.Exit(1)
+	//}
+	//b, err := modifyCfg(cfg)
+	////fmt.Println(b.String())
+	//
+	//dir, _ = os.Getwd()
+	//path = dir + "/conf/my.ini.local"
+	//
+	//f, err := os.Create(path)
+	//defer f.Close()
+	//f.WriteString(b.String())
+	http.HandleFunc("/hello", sayHello)
+	err := http.ListenAndServe(
+		":80",
+		nil,
+	)
+	if err != nil {
+		fmt.Printf("http serve failed, err:%v\n", err)
+		return
+	}
+	studyChi()
 }

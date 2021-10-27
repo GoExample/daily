@@ -2,6 +2,16 @@
 
 1. 编译问题，带有动态外部库，所有会造成本地编译，环境上无法运行。还有，编译的二进制文件带有本地路径。
 
+   [CGO_ENABLED环境变量对Go静态编译机制的影响]: https://johng.cn/cgo-enabled-affect-go-static-compile/
+   
+   ```bash
+   # 推荐使用下面命令解决
+   # CGO_ENABLED 是否启用CGO
+   # -trimpath 移除编译结果的系统路径
+   # -ldflags "-s -w" -w 表示关闭DWARF的调试信息，-s 表示strip -s关闭符号链接表
+   export CGO_ENABLED=0 go build -trimpath -ldflags "-s -w"
+   ```
+   
    ```Go
    // hello.go
    package main
@@ -23,7 +33,7 @@
        }
    }
    ```
-
+   
    ```bash
    root@ubuntu:~/GolandProjects/GoExample/daily/example/hello# go build
    root@ubuntu:~/GolandProjects/GoExample/daily/example/hello# ldd hello 
@@ -35,7 +45,7 @@
    root@ubuntu:~/GolandProjects/GoExample/daily/example/hello# strings hello |grep GoExample
    /root/GolandProjects/GoExample/daily/example/hello/main.go
    ```
-
+   
    ```bash
    1. 编译时候，设置CGO_ENABLED=0，解决动态链接库问题
    root@ubuntu:~/GolandProjects/GoExample/daily/example/hello# export CGO_ENABLED=0
@@ -48,3 +58,4 @@
    root@ubuntu:~/GolandProjects/GoExample/daily/example/hello# go build -trimpath
    root@ubuntu:~/GolandProjects/GoExample/daily/example/hello# strings hello |grep GoExample
    ```
+

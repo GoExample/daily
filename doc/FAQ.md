@@ -10,6 +10,8 @@
    # -trimpath 移除编译结果的系统路径
    # -ldflags "-s -w" -w 表示关闭DWARF的调试信息，-s 表示strip -s关闭符号链接表
    export CGO_ENABLED=0 go build -trimpath -ldflags "-s -w"
+   
+   go tool link 查看符号表
    ```
    
    ```Go
@@ -33,7 +35,7 @@
        }
    }
    ```
-   
+
    ```bash
    root@ubuntu:~/GolandProjects/GoExample/daily/example/hello# go build
    root@ubuntu:~/GolandProjects/GoExample/daily/example/hello# ldd hello 

@@ -25,7 +25,7 @@ func main() {
     r := gin.Default()
 
     r.GET("/", func(c *gin.Context) {
-        c.JSON(http.StatusOK, gin.H{"title": "Hello, welcome to gin world!", "version": goVersion, "commit id": gitHash, "build time": buildStamp})
+        c.JSON(http.StatusOK, gin.H{"title": "Hello, welcome to gin world!", "version": goVersion, "build.CommitId": gitHash, "build.Time:": buildStamp})
     })
     err := r.Run(":80")
     if err != nil {

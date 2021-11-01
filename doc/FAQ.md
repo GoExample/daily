@@ -61,3 +61,28 @@
    root@ubuntu:~/GolandProjects/GoExample/daily/example/hello# strings hello |grep GoExample
    ```
 
+2. sql语句中and级别优先于or，sqlalchemy中有两种关联表之间的关系。
+
+   ```python
+   #方法一、在modes上用ForeignKey进行外键管理
+   class DpiUserLogin(db.Model):
+       __tablename__ = 'dpiuserlogins'
+   
+       dpiUserLoginId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+       operationLogId = db.Column(db.Integer, db.ForeignKey('operationlogs.operationLogId'))
+       
+   DpiUserCmdLog.query.join(
+       OperationLog
+   ).order_by(
+       DpiUserCmdLog.timestamp.asc()
+   ).all()
+   
+   # 方法二、
+   exp = or_(
+           (and_(Ip2Mac.mac == TopDevice.mac, Ip2Mac.ip == TopDevice.ip)),
+           (and_(TopDevice.mac == '', Ip2Mac.ip == TopDevice.ip))
+       )
+   db.session.query(Ip2Mac, TopDevice).outerjoin(TopDevice, exp).filter(Ip2Mac.id > 1).all()
+   ```
+
+   

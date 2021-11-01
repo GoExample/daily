@@ -3,17 +3,21 @@
 1. 编译问题，带有动态外部库，所有会造成本地编译，环境上无法运行。还有，编译的二进制文件带有本地路径。
 
    [CGO_ENABLED环境变量对Go静态编译机制的影响]: https://johng.cn/cgo-enabled-affect-go-static-compile/
-   
+
    ```bash
    # 推荐使用下面命令解决
    # CGO_ENABLED 是否启用CGO
    # -trimpath 移除编译结果的系统路径
    # -ldflags "-s -w" -w 表示关闭DWARF的调试信息，-s 表示strip -s关闭符号链接表
+   # -w 去掉调试信息
+   # -s 去掉符号表
+   # -X 注入变量, 编译时赋值
+   
    export CGO_ENABLED=0 go build -trimpath -ldflags "-s -w"
    
    go tool link 查看符号表
    ```
-   
+
    ```Go
    // hello.go
    package main
@@ -47,7 +51,7 @@
    root@ubuntu:~/GolandProjects/GoExample/daily/example/hello# strings hello |grep GoExample
    /root/GolandProjects/GoExample/daily/example/hello/main.go
    ```
-   
+
    ```bash
    1. 编译时候，设置CGO_ENABLED=0，解决动态链接库问题
    root@ubuntu:~/GolandProjects/GoExample/daily/example/hello# export CGO_ENABLED=0
@@ -83,6 +87,17 @@
            (and_(TopDevice.mac == '', Ip2Mac.ip == TopDevice.ip))
        )
    db.session.query(Ip2Mac, TopDevice).outerjoin(TopDevice, exp).filter(Ip2Mac.id > 1).all()
+   ```
+
+3. github拉去代码换成token，拉取路径如下：
+
+   ```
+   使用方法：
+   1)从Settings页面 Personal access tokens 生成唯一的Token
+   2 获取token 注意生成了就要保存 有效期过期或者忘记了只能重新生成了
+   2) 手动拼接出远程仓库的地址，比如：https://$token@github.com/owner/repo.git
+   3）从以上地址克隆或使用git remote add 的方式关联本地仓库，之后都不需要输入用户名和密码信息。
+   实例：git remote set-url origin https://$token@github.com/work/base.git
    ```
 
    

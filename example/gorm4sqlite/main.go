@@ -48,6 +48,18 @@ func main() {
     // 删除
     db.Delete(&u)
     printAllRecords(db)
+
+    fmt.Println("===================")
+    u4 := UserInfo{Name: "李六", Gender: "男", Hobby: "足球", Age: 28}
+    u5 := UserInfo{Name: "钱七", Gender: "男", Hobby: "篮球", Age: 35}
+    u6 := UserInfo{Name: "赵八", Gender: "男", Hobby: "双色球", Age: 38}
+    db.Create(&u4)
+    db.Create(&u5)
+    db.Create(&u6)
+    printAllRecords(db)
+
+    db.Where("id = ?", 5).Delete(&UserInfo{})
+    printAllRecords(db)
 }
 
 func printAllRecords(db *gorm.DB) {
@@ -58,3 +70,5 @@ func printAllRecords(db *gorm.DB) {
         fmt.Printf("ID = %d, Name = %s, Age = %d, Hobby = %s\n", user.ID, user.Name, user.Age, user.Hobby)
     }
 }
+
+// https://www.cnblogs.com/bigdataZJ/p/gorm-crud.html

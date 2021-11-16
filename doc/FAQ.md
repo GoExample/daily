@@ -112,4 +112,34 @@
    # CC：Carbon Copy，抄送。
    ```
    
+   ```bash
+   # 列出标签
+   git tag
+   git tag -l
+   git tag --list
+   
+   # 打附注标签
+   git tag -a v0.1.0 -m "init project"
+   
+   # 打轻量标签
+   git tag v1.4-lw
+   
+   # 查看标签
+   git show v0.1.0
+   
+   # 后期打标签
+   git log --pretty=oneline
+   git tag -a v1.2 9fceb02
+   
+   # 单个标签推送到远端
+   git push origin <tagname>
+   
+   # 全部标签推送到远端
+   git push origin --tags
+   
+   # 删除标签
+   git tag -d v1.4-lw
+   git push origin --delete v1.4-lw
+   ```
+   
    

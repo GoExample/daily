@@ -111,7 +111,7 @@
    # AFAIK：As Far As I Know，据我所知。
    # CC：Carbon Copy，抄送。
    ```
-   
+
    ```bash
    # 列出标签
    git tag
@@ -140,6 +140,17 @@
    # 删除标签
    git tag -d v1.4-lw
    git push origin --delete v1.4-lw
+
+   # 导出最新代码
+   git archive -o latest.zip HEAD
+   ```
+
+   ```bash
+   # 如果我们git clone的下载代码的时候是连接的https://而不是git@git (ssh)的形式，当我们操作git pull/push到远程的时候，总是提示我们输入账号和密码才能操作成功，频繁的输入账号和密码会很麻烦。解决办法：
+   # git bash进入你的项目目录，输入：
+   git config --global credential.helper store
+
+   # 然后你会在你本地生成一个文本，上边记录你的账号和密码。当然这些你可以不用关心。
    ```
    
    

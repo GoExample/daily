@@ -3,6 +3,8 @@ package main
 import (
 	"errors"
 	"fmt"
+	"math/rand"
+	"time"
 )
 
 var ErrOutOfRange = errors.New("out of range")
@@ -52,25 +54,30 @@ func (b *Bitmap) Contain(n uint64) bool {
 	return b.store[index]&(1<<position) != 0
 }
 
-func (b *Bitmap) Print() {
+func (b *Bitmap) Length() int {
+	length := 0
+	for i := 0; i < len(b.store); i++ {
+		for j := 0; j < 8; j++ {
+			if b.store[i]>>j&1 == 1 {
+				length += 1
+			}
+		}
+	}
+	return length
+}
+
+func (b *Bitmap) Print() int {
+	length := 0
 	for i := 0; i < len(b.store); i++ {
 		binStr := []rune(fmt.Sprintf("%b", b.store[i]))
 		for index, value := range revertString(binStr) {
 			if string(value) == "1" {
+				length += 1
 				fmt.Println(i*8 + index)
 			}
 		}
 	}
-}
-
-func (b *Bitmap) Log() {
-	for i := 0; i < len(b.store); i++ {
-		for j := 0; j < 8; j++ {
-			if b.store[i]>>j&1 == 1 {
-				fmt.Println(i*8 + j)
-			}
-		}
-	}
+	return length
 }
 
 func revertString(from []rune) string {
@@ -104,7 +111,21 @@ func main() {
 		fmt.Printf("删除后查询 %t\n", m.Contain(data))
 		fmt.Println("=========================================================")
 	}
-	m.Log()
+	m.Length()
+
+	maxNumber := 1000
+	mb := NewBitmap(maxNumber/8 + 1)
+	for i := 0; i < maxNumber; i++ {
+		rand.Seed(time.Now().UnixNano())
+		randomNum := uint64(rand.Int63n(int64(maxNumber)))
+		fmt.Printf("random number is %d\n", randomNum)
+		err := mb.Set(randomNum)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+	}
+	fmt.Printf("Length is %d\n", mb.Print())
 }
 
 func bitOperation() {

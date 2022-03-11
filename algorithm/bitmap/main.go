@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"strings"
 	"time"
 )
 
@@ -90,7 +91,7 @@ func revertString(from []rune) string {
 
 func main() {
 	bitOperation()
-	fmt.Println("=========================================================")
+	fmt.Println(strings.Repeat("=", 80))
 
 	m := NewBitmap(3)
 	var testData = [...]uint64{0, 5, 15, 23, 24}
@@ -109,15 +110,18 @@ func main() {
 			fmt.Println(err)
 		}
 		fmt.Printf("删除后查询 %t\n", m.Contain(data))
-		fmt.Println("=========================================================")
+		fmt.Println(strings.Repeat("=", 80))
 	}
 	m.Length()
 
-	maxNumber := 1000
+	maxNumber := 100000
 	mb := NewBitmap(maxNumber/8 + 1)
 	for i := 0; i < maxNumber; i++ {
 		rand.Seed(time.Now().UnixNano())
 		randomNum := uint64(rand.Int63n(int64(maxNumber)))
+		if i % 1000 == 0 {
+			fmt.Printf("i = %d, valid length = %d\n", i, mb.Length())
+		}
 		fmt.Printf("random number is %d\n", randomNum)
 		err := mb.Set(randomNum)
 		if err != nil {

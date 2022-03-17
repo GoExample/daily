@@ -1,6 +1,6 @@
 module gorm4sqlite
 
-go 1.17
+go 1.18
 
 require github.com/jinzhu/gorm v1.9.16
 

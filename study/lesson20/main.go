@@ -4,14 +4,15 @@ import (
 	"bytes"
 	"crypto/tls"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"gopkg.in/ini.v1"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"path"
 	"path/filepath"
 	"reflect"
 )
-
 
 type srvConfig struct {
 	tlsRandSrvConfig *tls.Config
@@ -34,7 +35,6 @@ type srvConfig struct {
 var RELEASE = "true"
 var srvCfg srvConfig
 
-
 func main() {
 	fmt.Println(path.Join("a", "b", "c"))
 	fmt.Println(path.Join("a", "b/c"))
@@ -46,12 +46,12 @@ func main() {
 	fmt.Println(path.Join("a", ""))
 	fmt.Println(path.Join("", "a"))
 
-	path, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+	abs, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 	var pathName interface{}
 	if RELEASE == "true" {
 		pathName, _ = Asset("conf/conf.ini")
 	} else {
-		pathName = path + "/conf/conf.ini"
+		pathName = abs + "/conf/conf.ini"
 	}
 	cfg, err := ini.Load(pathName)
 	if err != nil {
@@ -64,16 +64,16 @@ func main() {
 		srvCfg.certFile = cfg.Section("connection").Key("cert").String()
 		srvCfg.keyFile = cfg.Section("connection").Key("key").String()
 	} else {
-		srvCfg.caFile = path + "/" + cfg.Section("connection").Key("ca").String()
-		srvCfg.certFile = path + "/" + cfg.Section("connection").Key("cert").String()
-		srvCfg.keyFile = path + "/" + cfg.Section("connection").Key("key").String()
+		srvCfg.caFile = abs + "/" + cfg.Section("connection").Key("ca").String()
+		srvCfg.certFile = abs + "/" + cfg.Section("connection").Key("cert").String()
+		srvCfg.keyFile = abs + "/" + cfg.Section("connection").Key("key").String()
 	}
 
 	fmt.Println(srvCfg.caFile)
 	fmt.Println(srvCfg.certFile)
 	fmt.Println(srvCfg.keyFile)
 
-	ca1, _ := ioutil.ReadFile(path + "/" + srvCfg.caFile)
+	ca1, _ := ioutil.ReadFile(abs + "/" + srvCfg.caFile)
 	ca2, _ := Asset(srvCfg.caFile)
 
 	fmt.Println("==========================")
@@ -81,23 +81,20 @@ func main() {
 	fmt.Println(bytes.Equal(ca1, nil))
 	fmt.Println(bytes.Equal(ca2, nil))
 
-
 	fmt.Println(srvCfg.certFile, srvCfg.keyFile)
-	cert1, _ := tls.LoadX509KeyPair(path + "/" + srvCfg.certFile, path + "/" + srvCfg.keyFile)
+	cert1, _ := tls.LoadX509KeyPair(abs+"/"+srvCfg.certFile, abs+"/"+srvCfg.keyFile)
 
-	certContent, _:= Asset(srvCfg.certFile)
-	keyContent, _:= Asset(srvCfg.keyFile)
+	certContent, _ := Asset(srvCfg.certFile)
+	keyContent, _ := Asset(srvCfg.keyFile)
 	cert2, _ := tls.X509KeyPair(certContent, keyContent)
 
 	fmt.Println(cert1)
 	fmt.Println(cert2)
 	fmt.Println(reflect.TypeOf(cert1))
-	/*
-		r := gin.Default()
-		r.GET("/", func(c *gin.Context) { c.JSON(http.StatusOK, "Hello world!") })
-		err := r.Run(":8888")
-		if err != nil {
-			return
-		}
-	*/
+	r := gin.Default()
+	r.GET("/", func(c *gin.Context) { c.JSON(http.StatusOK, "Hello world!") })
+	err = r.Run(":8888")
+	if err != nil {
+		return
+	}
 }

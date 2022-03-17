@@ -1,9 +1,9 @@
 module lesson20
 
-go 1.17
+go 1.18
 
 require (
-	github.com/gin-gonic/gin v1.7.4
+	github.com/gin-gonic/gin v1.7.7
 	gopkg.in/ini.v1 v1.63.2
 )
 

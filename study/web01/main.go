@@ -45,7 +45,7 @@ func main() {
     */
 
     http.HandleFunc("/hello", sayHello)
-    http.ListenAndServe(
+    err = http.ListenAndServe(
         ":9000",
         nil,
     )

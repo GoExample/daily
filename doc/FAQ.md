@@ -153,4 +153,70 @@
    # 然后你会在你本地生成一个文本，上边记录你的账号和密码。当然这些你可以不用关心。
    ```
    
+4. https://ipwhoisinfo.com/ IP信息特别准确
+
+5. linux ulimit 调优问题
+
+   inux系统默认open files数目为1024, 有时应用程序会报Too many open files的错误，是因为进程打开了太多的文件，导致open files数目不够。这就需要修改参数进行调优。特别是有大量文件访问的应用，如elasticsearch、filebeat等, 更要注意这个问题。
+   网上的很多教程，都只是简单的说明如何设置，但很多东西没讲明白，而且有时候设置后却不能生效，关于其验证也比较模糊。这里对使用的一些经验进行整理。
+
+   关于进程打开文件描述数量限制，有三个相关参数
+   file-max：系统所有进程一共可以打开的文件数量 ；**这项参数是系统级别的。**系统不一样，默认值不同。
+   nr_open：单个进程可分配的最大文件数；**这项参数也是系统级别的。**默认：1048576
+   limits：当前shell以及由它启动的进程的资源限制；**这项参数是用户所在shell或其所启动的进程级别的。**默认：1024
+   **大概结论，file-max是内核可分配的最大文件数，nr_open是单个进程可分配的最大文件数，在在配置ulimit时，如果要超过1048576，需要先增大nr_open；并且根据需求调整file-max 。**
+
+   ```bash
+   root@ubuntu18:~# sysctl  -a | grep 'fs.file-max'
+   fs.file-max = 52706963
+   root@ubuntu18:~# ulimit -a | grep "open files"
+   open files            (-n) 1024
+   root@ubuntu18:~# sysctl -a | grep 'fs.nr_open'
+   fs.nr_open = 1048576
+   ```
+
+   ##### **修改file-max 和 nr_open 参数配置**
+
+   ```bash
+   # 临时修改，重启失效
+   echo  167772166 > /proc/sys/fs/file-max  或者
+   sysctl -w "fs.file-max=167772166"
    
+   echo  167772166 > /proc/sys/fs/nr_open或者
+   sysctl -w "fs.nr_open=167772166"
+   
+   # 永久生效
+   echo "fs.file-max = 167772166 " >> /etc/sysctl.conf
+   sysctl -p # 立即生效
+   
+   echo "fs.nr_open = 167772166 " >> /etc/sysctl.conf
+   sysctl -p # 立即生效
+   ```
+
+   **修改ulimit参数配置**
+
+   ```bash
+   # 临时修改，重启失效
+   ulimit -n 204800
+   
+   # 永久生效，root 用户和其它（*表示其它）一起生效，单用可能不生效
+   * soft nofile 204800
+   * hard nofile 204800
+   * soft nproc 204800
+   * hard nproc 204800
+   root soft nofile 204800
+   root hard nofile 204800
+   root soft nproc 204800
+   root hard nproc 204800
+   
+   # 查看结果，-n是可以打开最大文件描述符的数量。 -u是用户最大可用的进程数。
+   ulimit -n
+   ulimit -u
+   
+   # 不生效原因及解决方案，
+   1. 检查/etc/pam.d/login、/etc/pam.d/su、/etc/pam.d/sshd必须存在session required pam_limits.so
+   2. 检查 /etc/ssh/ssd_config 中，必须存在UsePAM yes
+   3. limits.conf 文件中， root和*一起使用，单独root或单独*，可能都不生效
+   ```
+
+6. 

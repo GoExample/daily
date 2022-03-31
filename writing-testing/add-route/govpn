@@ -1,0 +1,24 @@
+
+config globals 'gateway'
+	option newGateway '192.168.0.1'
+	option oldGateway '192.168.0.1'
+
+config rule 'private'
+	option selFixedIp '1'
+	option hop '1'
+	option chainId '4835'
+	option country 'Canada'
+
+config route 'supernode'
+	option name 'superjumpers.info'
+	option address '136.175.178.75'
+
+config globals 'timer'
+	option genChainCount '2'
+	option jumpChangeChainCount '3'
+	option genChainUnit '2'
+	option jumpChangeChainUnit '3'
+	option jumpChangeChain '0'
+	option faultChangeChain '0'
+	option genChain '0'
+

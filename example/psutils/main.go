@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"strings"
+
 	"psutils/cmd"
 )
 
@@ -12,7 +14,7 @@ func main() {
 		return
 	}
 	fmt.Printf("host info: %s\n", string(hostInfo))
-	outputSepLine()
+	fmt.Println("\n" + strings.Repeat("=", 80))
 
 	cpuInfos, err := cmd.GetCPUInfo()
 	if err != nil {
@@ -23,7 +25,7 @@ func main() {
 	for _, info := range cpuInfos {
 		fmt.Printf(string(info))
 	}
-	outputSepLine()
+	fmt.Println("\n" + strings.Repeat("=", 80))
 
 	percent, err := cmd.GetCPUPercent()
 	if err != nil {
@@ -31,7 +33,7 @@ func main() {
 		return
 	}
 	fmt.Printf("cpu percent:%v\n", percent)
-	outputSepLine()
+	fmt.Println("\n" + strings.Repeat("=", 80))
 
 	swapMemory, err := cmd.GetSwapMemory()
 	if err != nil {
@@ -46,11 +48,11 @@ func main() {
 		return
 	}
 	fmt.Printf("system virtual memory information: %s\n", string(virtualMemory))
-	outputSepLine()
+	fmt.Println("\n" + strings.Repeat("=", 80))
 
 	cmd.GetDiskInfo()
 	cmd.GetNetIoInformation()
-	outputSepLine()
+	fmt.Println("\n" + strings.Repeat("=", 80))
 
 	ip, err := cmd.GetLocalIP()
 	if err != nil {
@@ -59,8 +61,4 @@ func main() {
 	fmt.Printf("Local Ip:\n%s\n", ip)
 	fmt.Println("Outbound Ip: ")
 	cmd.GetOutboundIP()
-}
-
-func outputSepLine() {
-	fmt.Println("\n================================================================================")
 }

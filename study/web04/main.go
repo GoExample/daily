@@ -3,10 +3,16 @@ package main
 import (
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
+	_ "net/http/pprof"
 )
 
 func main() {
+	go func() {
+		log.Println(http.ListenAndServe("0.0.0.0:9001", nil))
+	}()
+
 	http.HandleFunc("/", sayHello)
 	err := http.ListenAndServe(":9000", nil)
 	if err != nil {

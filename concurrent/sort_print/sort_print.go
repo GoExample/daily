@@ -30,7 +30,7 @@ func printCat(wg *sync.WaitGroup, counter uint64, catch, dogCh chan struct{}) {
 			wg.Done()
 			return
 		}
-		<- catch
+		<-catch
 		fmt.Println("cat")
 		atomic.AddUint64(&counter, 1)
 		dogCh <- struct{}{}
@@ -43,7 +43,7 @@ func printDog(wg *sync.WaitGroup, counter uint64, dogCh, fishCh chan struct{}) {
 			wg.Done()
 			return
 		}
-		<- dogCh
+		<-dogCh
 		fmt.Println("dog")
 		atomic.AddUint64(&counter, 1)
 		fishCh <- struct{}{}
@@ -56,7 +56,7 @@ func printFish(wg *sync.WaitGroup, counter uint64, fishCh, catCh chan struct{}) 
 			wg.Done()
 			return
 		}
-		<- fishCh
+		<-fishCh
 		fmt.Println("fish")
 		atomic.AddUint64(&counter, 1)
 		catCh <- struct{}{}
